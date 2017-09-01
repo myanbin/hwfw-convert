@@ -1,0 +1,27 @@
+{
+  "name": "hwfw-convert",
+  "version": "1.0.0",
+  "description": "A simple converter between half width and full width character.",
+  "main": "convert.js",
+  "scripts": {
+    "test": "node ./test/coverall.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myanbin/hwfw-convert.git"
+  },
+  "keywords": [
+    "half",
+    "full",
+    "width",
+    "character",
+    "convert",
+    "tranform"
+  ],
+  "author": "Yanbin Ma",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/myanbin/hwfw-convert/issues"
+  },
+  "homepage": "https://github.com/myanbin/hwfw-convert#readme"
+}
