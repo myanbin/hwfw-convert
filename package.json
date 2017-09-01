@@ -1,6 +1,6 @@
 {
   "name": "hwfw-convert",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple converter between half width and full width character.",
   "main": "convert.js",
   "scripts": {

@@ -1,7 +1,7 @@
 /**
  * Width Converter
  * Copyright 2017 Yanbin Ma under MIT
- * https://github.com/myanbin
+ * https://github.com/myanbin/hwfw-convert
  */
 
 const CODEPOINT_BASE = '\uff10'.codePointAt(0) - '0'.codePointAt(0);
