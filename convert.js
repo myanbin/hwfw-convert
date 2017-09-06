@@ -47,7 +47,7 @@ function _full2half (source, options) {
           && codePoint >= 0xff10 && codePoint <= 0xff19) {
       output[index] = String.fromCodePoint(codePoint - CODEPOINT_BASE);
     } else if (/* Alpha Flag = */_options.alpha
-          && (codePoint >= 0xff21 && codePoint <= 0xff3a) || (codePoint >= 0xff41 && codePoint <= 0xff5a)) {
+          && ((codePoint >= 0xff21 && codePoint <= 0xff3a) || (codePoint >= 0xff41 && codePoint <= 0xff5a))) {
       output[index] = String.fromCodePoint(codePoint - CODEPOINT_BASE);
     } else if (/* Symbol Flag */_options.symbol
           && FULL_SYMBOLS.indexOf(codePoint) !== -1) {
@@ -93,7 +93,7 @@ function _half2full (source, options) {
           && codePoint >= 0x0030 && codePoint <= 0x0039) {
       output[index] = String.fromCodePoint(codePoint + CODEPOINT_BASE);
     } else if (/* Alpha Flag = */_options.alpha
-          && (codePoint >= 0x0041 && codePoint <= 0x005a) || (codePoint >= 0x0061 && codePoint <= 0x007a)) {
+          && ((codePoint >= 0x0041 && codePoint <= 0x005a) || (codePoint >= 0x0061 && codePoint <= 0x007a))) {
       output[index] = String.fromCodePoint(codePoint + CODEPOINT_BASE);
     } else if (/* Symbol Flag */_options.symbol
           && HALF_SYMBOLS.indexOf(codePoint) !== -1) {
