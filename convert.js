@@ -6,17 +6,29 @@
 
 const CODEPOINT_BASE = '\uff10'.codePointAt(0) - '0'.codePointAt(0);
 
-const RESERVED_PUNCTUATION = '';
+const CJK_PUNCTUATIONS = [
+  0xff0c/* ， */, 0x3002/* 。 */, 0xff01/* ！ */, 0xff08/* （ */, 0xff09/* ） */, 0x3001/* 、 */, 0xff1a/* ： */, 0xff1b/* ； */,
+  0xff1f/* ？ */, 0xff3b/* ［ */, 0xff3d/* ］ */, 0xff5e/* ～ */, 0x2018/* ‘ */, 0x2019/* ’ */, 0x201c/* “ */, 0x201d/* ” */,
+  0x300a/* 《 */, 0x300b/* 》 */,
+];
+
+const LATIN_PUNCTUATIONS = [
+  0x2c/* , */, 0x2e/* . */, 0x21/* ! */, 0x28/* ( */, 0x29/* ) */, 0x2c/* , */, 0x3a/* : */, 0x3b/* ; */,
+  0x3f/* ? */, 0x5b/* [ */, 0x5d/* ] */, 0x7e/* ~ */, 0x27/* ' */, 0x27/* ' */, 0x22/* " */, 0x22/* " */,
+  0x3c/* < */, 0x3e/* > */,
+];
+
 
 /* Reference: https://en.wikipedia.org/wiki/Halfwidth_and_fullwidth_forms */
 const FULL_SYMBOLS = [
-  0xff02, 0xff03, 0xff04, 0xff05, 0xff06, 0xff07, 0xff0a, 0xff0b,
-  0xff0d, 0xff0e, 0xff0f, 0xff1c, 0xff1d, 0xff1e, 0xff20, 0xff3c,
-  0xff3e, 0xff3f, 0xff40, 0xff5b, 0xff5c, 0xff5d,
+  0xff02/* ＂ */, 0xff03/* ＃ */, 0xff04/* ＄ */, 0xff05/* ％ */, 0xff06/* ＆ */, 0xff07/* ＇ */, 0xff0a/* ＊ */, 0xff0b/* ＋ */,
+  0xff0d/* － */, 0xff0e/* ． */, 0xff0f/* ／ */, 0xff1c/* ＜ */, 0xff1d/* ＝ */, 0xff1e/* ＞ */, 0xff20/* ＠ */, 0xff3c/* ＼ */,
+  0xff3e/* ＾ */, 0xff3f/* ＿ */, 0xff40/* ｀ */, 0xff5b/* ｛ */, 0xff5c/* ｜ */, 0xff5d/* ｝ */,
 ];
 const HALF_SYMBOLS = FULL_SYMBOLS.map(function (codePoint) {
   return codePoint - CODEPOINT_BASE;
 });
+
 
 
 function _mergeOptions (_options) {
@@ -52,8 +64,9 @@ function _full2half (source, options) {
     } else if (/* Symbol Flag */_options.symbol
           && FULL_SYMBOLS.indexOf(codePoint) !== -1) {
       output[index] = String.fromCodePoint(codePoint - CODEPOINT_BASE);
-    } else if (/* Punctucation Flag */_options.punctucation) {
-      output[index] = source[index];
+    } else if (/* Punctucation Flag */_options.punctucation
+          && CJK_PUNCTUATIONS.indexOf(codePoint) !== -1) {
+      output[index] = String.fromCodePoint(LATIN_PUNCTUATIONS[CJK_PUNCTUATIONS.indexOf(codePoint)]);
     } else if (/* Space Flag = */_options.space
           && codePoint === 0x3000/* Fullwidth Space */) {
       output[index] = String.fromCodePoint(0x0020);
@@ -67,6 +80,9 @@ function _full2half (source, options) {
       destination = destination.replace(/\d[\uff0c]\d/g, function (match) {
         return match.replace(/[\uff0c]/, ',');
       });
+      destination = destination.replace(/\d\d[\uff1a]\d\d/g, function (match) {
+        return match.replace(/[\uff1a]/, ':');
+      })
     }
     if (/* Symbol Flag */_options.symbol) {
       destination = destination.replace(/https?[\uff1a]/g, function (match) {
@@ -98,8 +114,9 @@ function _half2full (source, options) {
     } else if (/* Symbol Flag */_options.symbol
           && HALF_SYMBOLS.indexOf(codePoint) !== -1) {
       output[index] = String.fromCodePoint(codePoint + CODEPOINT_BASE);
-    } else if (/* Punctucation Flag */_options.punctucation) {
-      output[index] = source[index];
+    } else if (/* Punctucation Flag */_options.punctucation
+          && LATIN_PUNCTUATIONS.indexOf(codePoint) !== -1) {
+      output[index] = String.fromCodePoint(CJK_PUNCTUATIONS[LATIN_PUNCTUATIONS.indexOf(codePoint)]);
     } else if (/* Space Flag = */_options.space
           && codePoint === 0x0020/* Fullwidth Space */) {
       output[index] = String.fromCodePoint(0x3000);
@@ -113,6 +130,9 @@ function _half2full (source, options) {
       destination = destination.replace(/\d[,]\d{3}/g, function (match) {
         return match.replace(/[,]/, String.fromCodePoint(0xff0c));
       });
+      destination = destination.replace(/\d\d[:]]\d\d/g, function (match) {
+        return match.replace(/[:]/, String.fromCodePoint(0xff1a));
+      })
     }
     if (/* Symbol Flag */_options.symbol) {
       destination = destination.replace(/https?[:]/g, function (match) {
