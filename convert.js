@@ -9,13 +9,13 @@ const CODEPOINT_BASE = '\uff10'.codePointAt(0) - '0'.codePointAt(0);
 const CJK_PUNCTUATIONS = [
   0xff0c/* ， */, 0x3002/* 。 */, 0xff01/* ！ */, 0xff08/* （ */, 0xff09/* ） */, 0x3001/* 、 */, 0xff1a/* ： */, 0xff1b/* ； */,
   0xff1f/* ？ */, 0xff3b/* ［ */, 0xff3d/* ］ */, 0xff5e/* ～ */, 0x2018/* ‘ */, 0x2019/* ’ */, 0x201c/* “ */, 0x201d/* ” */,
-  0x300a/* 《 */, 0x300b/* 》 */,
+  0x300a/* 《 */, 0x300b/* 》 */, 0x3008/* 〈 */, 0x3009/* 〉 */, 0x3010/* 【 */, 0x3011/* 】 */,
 ];
 
 const LATIN_PUNCTUATIONS = [
   0x2c/* , */, 0x2e/* . */, 0x21/* ! */, 0x28/* ( */, 0x29/* ) */, 0x2c/* , */, 0x3a/* : */, 0x3b/* ; */,
   0x3f/* ? */, 0x5b/* [ */, 0x5d/* ] */, 0x7e/* ~ */, 0x27/* ' */, 0x27/* ' */, 0x22/* " */, 0x22/* " */,
-  0x3c/* < */, 0x3e/* > */,
+  0xab/* « */, 0xbb/* » */, 0x2039/* ‹ */, 0x203a/* › */, 0x5b/* [ */, 0x5d/* ] */,
 ];
 
 
@@ -37,7 +37,7 @@ function _mergeOptions (_options) {
     alpha: true,              // 将全角字母转换成半角
     space: true,              // 将全角空格转换成半角
     symbol: true,             // 将全角的 #、$、%、& 等特殊字符转换成半角（不包括中文标点符号）
-    punctuation: false,      // 将中文标点符号转换成对应英文标点符号（在中文环境中不推荐使用）
+    punctuation: false,       // 将中文标点符号转换成对应英文标点符号（在中文环境中不推荐使用）
     smart_mode: true,         // 智能模式。可以识别出数值、网址等内容并进行精确转换
   };
   return Object.assign(defaultOptions, _options);
@@ -64,15 +64,17 @@ function _full2half (source, options) {
     } else if (/* Symbol Flag */_options.symbol
           && FULL_SYMBOLS.indexOf(codePoint) !== -1) {
       output[index] = String.fromCodePoint(codePoint - CODEPOINT_BASE);
-    } else if (/* Punctuation Flag */_options.punctuation
-          && CJK_PUNCTUATIONS.indexOf(codePoint) !== -1) {
-      output[index] = String.fromCodePoint(LATIN_PUNCTUATIONS[CJK_PUNCTUATIONS.indexOf(codePoint)]);
     } else if (/* Space Flag = */_options.space
           && codePoint === 0x3000/* Fullwidth Space */) {
       output[index] = String.fromCodePoint(0x0020);
     } else {
       output[index] = source[index];
     }
+
+    if (/* Punctuation Flag */_options.punctuation
+          && CJK_PUNCTUATIONS.indexOf(codePoint) !== -1) {
+      output[index] = String.fromCodePoint(LATIN_PUNCTUATIONS[CJK_PUNCTUATIONS.indexOf(codePoint)]);
+}
   }
   let destination = output.join('');
   if (/* Smart Mode = */_options.smart_mode) {
@@ -82,6 +84,9 @@ function _full2half (source, options) {
       });
       destination = destination.replace(/\d\d[\uff1a]\d\d/g, function (match) {
         return match.replace(/[\uff1a]/, ':');
+      });
+      destination = destination.replace(/\d\d[\uff0e]\d\d/g, function (match) {
+        return match.replace(/[\uff0e]/, '.');
       })
     }
     if (/* Symbol Flag */_options.symbol) {
@@ -114,15 +119,17 @@ function _half2full (source, options) {
     } else if (/* Symbol Flag */_options.symbol
           && HALF_SYMBOLS.indexOf(codePoint) !== -1) {
       output[index] = String.fromCodePoint(codePoint + CODEPOINT_BASE);
-    } else if (/* Punctuation Flag */_options.punctuation
-          && LATIN_PUNCTUATIONS.indexOf(codePoint) !== -1) {
-      output[index] = String.fromCodePoint(CJK_PUNCTUATIONS[LATIN_PUNCTUATIONS.indexOf(codePoint)]);
     } else if (/* Space Flag = */_options.space
-          && codePoint === 0x0020/* Fullwidth Space */) {
+          && codePoint === 0x0020/* Halfwidth Space */) {
       output[index] = String.fromCodePoint(0x3000);
     } else {
       output[index] = source[index];
     }
+
+    if (/* Punctuation Flag */_options.punctuation
+          && LATIN_PUNCTUATIONS.indexOf(codePoint) !== -1) {
+      output[index] = String.fromCodePoint(CJK_PUNCTUATIONS[LATIN_PUNCTUATIONS.indexOf(codePoint)]);
+}
   }
   let destination = output.join('');
   if (/* Smart Mode = */_options.smartMode) {
@@ -132,7 +139,10 @@ function _half2full (source, options) {
       });
       destination = destination.replace(/\d\d[:]]\d\d/g, function (match) {
         return match.replace(/[:]/, String.fromCodePoint(0xff1a));
-      })
+      });
+      destination = destination.replace(/\d\d[.]]\d\d/g, function (match) {
+        return match.replace(/[.]/, String.fromCodePoint(0xff0e));
+      });
     }
     if (/* Symbol Flag */_options.symbol) {
       destination = destination.replace(/https?[:]/g, function (match) {
@@ -142,7 +152,6 @@ function _half2full (source, options) {
   }
   return destination;
 }
-
 
 exports.half2full = _half2full;
 exports.full2half = _full2half;
