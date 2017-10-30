@@ -1,10 +1,13 @@
 {
   "name": "hwfw-convert",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A simple converter between half width and full width character.",
   "main": "convert.js",
   "scripts": {
-    "test": "node ./test/coverall.js"
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "^4.0.1"
   },
   "repository": {
     "type": "git",

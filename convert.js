@@ -74,7 +74,7 @@ function _full2half (source, options) {
     if (/* Punctuation Flag */_options.punctuation
           && CJK_PUNCTUATIONS.indexOf(codePoint) !== -1) {
       output[index] = String.fromCodePoint(LATIN_PUNCTUATIONS[CJK_PUNCTUATIONS.indexOf(codePoint)]);
-}
+    }
   }
   let destination = output.join('');
   if (/* Smart Mode = */_options.smart_mode) {
@@ -85,7 +85,11 @@ function _full2half (source, options) {
       destination = destination.replace(/\d\d[\uff1a]\d\d/g, function (match) {
         return match.replace(/[\uff1a]/, ':');
       });
-      destination = destination.replace(/\d\d[\uff0e]\d\d/g, function (match) {
+      destination = destination.replace(/\d[\uff0e]\d/g, function (match) {
+        return match.replace(/[\uff0e]/, '.');
+      });
+      
+      destination = destination.replace(/\d[\u3002]\d/g, function (match) {
         return match.replace(/[\uff0e]/, '.');
       })
     }
@@ -125,7 +129,6 @@ function _half2full (source, options) {
     } else {
       output[index] = source[index];
     }
-
     if (/* Punctuation Flag */_options.punctuation
           && LATIN_PUNCTUATIONS.indexOf(codePoint) !== -1) {
       output[index] = String.fromCodePoint(CJK_PUNCTUATIONS[LATIN_PUNCTUATIONS.indexOf(codePoint)]);
@@ -140,7 +143,7 @@ function _half2full (source, options) {
       destination = destination.replace(/\d\d[:]]\d\d/g, function (match) {
         return match.replace(/[:]/, String.fromCodePoint(0xff1a));
       });
-      destination = destination.replace(/\d\d[.]]\d\d/g, function (match) {
+      destination = destination.replace(/\d[.]]\d/g, function (match) {
         return match.replace(/[.]/, String.fromCodePoint(0xff0e));
       });
     }
