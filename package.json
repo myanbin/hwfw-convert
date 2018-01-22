@@ -13,14 +13,6 @@
     "type": "git",
     "url": "git+https://github.com/myanbin/hwfw-convert.git"
   },
-  "keywords": [
-    "half",
-    "full",
-    "width",
-    "character",
-    "convert",
-    "tranform"
-  ],
   "author": "Yanbin Ma",
   "license": "MIT",
   "bugs": {
